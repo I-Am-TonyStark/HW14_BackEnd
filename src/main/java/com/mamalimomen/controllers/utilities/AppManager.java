@@ -4,6 +4,8 @@ import com.mamalimomen.base.controllers.utilities.PersistenceUnitManager;
 import com.mamalimomen.base.controllers.utilities.PersistenceUnits;
 import com.mamalimomen.base.domains.BaseEntity;
 import com.mamalimomen.base.services.BaseService;
+import com.mamalimomen.services.Impl.AccountServiceImpl;
+import com.mamalimomen.services.Impl.PostServiceImpl;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;

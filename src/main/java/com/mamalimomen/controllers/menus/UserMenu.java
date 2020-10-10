@@ -1,5 +1,7 @@
 package com.mamalimomen.controllers.menus;
 
+import com.mamalimomen.domains.User;
+
 public class UserMenu<U extends User> extends AbstractMenu<U> {
     public UserMenu(U user) {
         super(user.getFullName() + "'s menu",
@@ -8,7 +10,7 @@ public class UserMenu<U extends User> extends AbstractMenu<U> {
                 "Change your username",
                 "Change your information",
                 "See your Posts",
-                "Insert new Post",
+                "Insert new PostRepository",
                 "See new Posts",
                 "See an Account",
                 "Delete your Account"

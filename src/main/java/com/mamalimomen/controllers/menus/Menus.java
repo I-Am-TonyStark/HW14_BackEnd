@@ -1,5 +1,7 @@
 package com.mamalimomen.controllers.menus;
 
+import com.mamalimomen.domains.User;
+
 public final class Menus {
     private Menus() {
     }

@@ -10,9 +10,11 @@ import java.util.Date;
 @SelectBeforeUpdate
 @NamedQueries({
         @NamedQuery(
-                name = "",
-                query = ""
-        ),
+                name = "Post.findAll",
+                query = "SELECT p FROM Post p"),
+        @NamedQuery(
+                name = "Post.findManyByAccountUsername",
+                query = "SELECT p FROM Post p JOIN p.account a WHERE a.user.username = ?1")
 })
 public class Post extends BaseEntity<Long> implements Comparable<Post> {
 

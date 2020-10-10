@@ -3,6 +3,7 @@ package com.mamalimomen.controllers.menus;
 import com.mamalimomen.base.controllers.guis.DialogProvider;
 import com.mamalimomen.base.controllers.menus.Menu;
 import com.mamalimomen.base.controllers.utilities.SingletonScanner;
+import com.mamalimomen.domains.User;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;

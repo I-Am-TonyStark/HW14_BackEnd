@@ -3,6 +3,7 @@ package com.mamalimomen.controllers.utilities;
 import com.mamalimomen.base.controllers.menus.Menu;
 import com.mamalimomen.controllers.menus.MainMenu;
 import com.mamalimomen.controllers.menus.UserMenu;
+import com.mamalimomen.domains.User;
 
 public final class MenuFactory {
     private MenuFactory() {

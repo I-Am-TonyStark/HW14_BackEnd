@@ -11,10 +11,10 @@ import javax.persistence.*;
 uniqueConstraints = {@UniqueConstraint(name = "unique_account_username",columnNames = {"id","username"})})
 @NamedQueries({
         @NamedQuery(
-                name = "Account.findByUsername",
+                name = "Account.findOneByUsername",
                 query = "SELECT a FROM Account a WHERE a.user.username = ?1"),
         @NamedQuery(
-                name = "Account.findActiveByUsername",
+                name = "Account.findOneActiveByUsername",
                 query = "SELECT a FROM Account a WHERE a.deleted = FALSE AND a.user.username = ?1")
 })
 public final class Account extends BaseEntity<Long> implements Comparable<Account> {

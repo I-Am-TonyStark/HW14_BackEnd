@@ -1,5 +1,7 @@
 package com.mamalimomen.controllers.menus;
 
+import com.mamalimomen.domains.User;
+
 public class MainMenu<U extends User> extends AbstractMenu<U> {
     public MainMenu() {
         super("main menu",
