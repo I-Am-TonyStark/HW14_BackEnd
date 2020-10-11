@@ -1,11 +1,10 @@
 package com.mamalimomen.repositories.impl;
 
-import com.mamalimomen.base.repositories.Impl.BaseRepositoryImpl;
-import com.mamalimomen.domains.Account;
+import com.mamalimomen.base.repositories.impl.BaseRepositoryImpl;
 import com.mamalimomen.domains.Post;
+import com.mamalimomen.dtos.PostSearchDTO;
 import com.mamalimomen.repositories.PostRepository;
-import com.mamalimomen.services.dtos.AccountDTO;
-import com.mamalimomen.services.dtos.PostDTO;
+import com.mamalimomen.dtos.PostDTO;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -13,15 +12,17 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class PostRepositoryImpl extends BaseRepositoryImpl<Long, Post, PostDTO> implements PostRepository {
+public class PostRepositoryImpl extends BaseRepositoryImpl<Long, Post, PostSearchDTO> implements PostRepository {
 
     public PostRepositoryImpl(EntityManager em) {
         super(em);
     }
 
     @Override
-    protected void setClausesForAdvancedSearch(PostDTO dto, List<Predicate> predicates, CriteriaBuilder cb, Root<Post> root) {
+    protected void setClausesForAdvancedSearch(PostSearchDTO dto, List<Predicate> predicates, CriteriaBuilder cb, Root<Post> root) {
         setText(dto.getText(), predicates, cb, root);
         setFromDate(dto.getFromDate(), predicates, cb, root);
         setTillDate(dto.getTillDate(), predicates, cb, root);
@@ -62,7 +63,17 @@ public class PostRepositoryImpl extends BaseRepositoryImpl<Long, Post, PostDTO> 
     }
 
     @Override
+    public List<PostDTO> findAllPosts(Function<Post, PostDTO> f) {
+        return findAllPosts().stream().map(f).collect(Collectors.toList());
+    }
+
+    @Override
     public List<Post> findManyPostsByAccountUsername(String username) {
         return findManyByNamedQuery("Post.findManyByAccountUsername", Post.class, username);
+    }
+
+    @Override
+    public List<PostDTO> findManyPostsByAccountUsername(String username, Function<Post, PostDTO> f) {
+        return findManyPostsByAccountUsername(username).stream().map(f).collect(Collectors.toList());
     }
 }

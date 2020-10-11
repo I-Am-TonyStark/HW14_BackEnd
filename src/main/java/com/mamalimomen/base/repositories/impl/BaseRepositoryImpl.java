@@ -1,8 +1,8 @@
-package com.mamalimomen.base.repositories.Impl;
+package com.mamalimomen.base.repositories.impl;
 
 import com.mamalimomen.base.domains.BaseEntity;
 import com.mamalimomen.base.repositories.BaseRepository;
-import com.mamalimomen.base.services.dtos.BaseDTO;
+import com.mamalimomen.base.dtos.BaseDTO;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class BaseRepositoryImpl<PK extends Number, E extends BaseEntity<PK>, D extends BaseDTO<PK>> implements BaseRepository<PK, E, D> {
+public abstract class BaseRepositoryImpl<PK extends Number, E extends BaseEntity<PK>, D extends BaseDTO<Long>> implements BaseRepository<PK, E, D> {
     private final EntityManager em;
 
     public BaseRepositoryImpl(EntityManager em) {
@@ -111,6 +111,26 @@ public abstract class BaseRepositoryImpl<PK extends Number, E extends BaseEntity
         }
         return false;
     }
+
+    /*@Override
+    public boolean deleteOne(E e) {
+        try {
+            em.getTransaction().begin();
+
+            Query query = em.createQuery("DELETE FROM " + e.getClass().getSimpleName() + "e WHERE e.id = ?1");
+            query.setParameter(1, e.getId());
+            int result = query.executeUpdate();
+
+            em.getTransaction().commit();
+
+            if (result > 0) {
+                return true;
+            }
+        } catch (IllegalArgumentException | RollbackException ex) {
+            em.getTransaction().rollback();
+        }
+        return false;
+    }*/
 
     @Override
     public boolean deleteMany(List<E> l) {

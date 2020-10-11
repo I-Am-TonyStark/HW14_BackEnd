@@ -1,12 +1,12 @@
 package com.mamalimomen.base.repositories;
 
 import com.mamalimomen.base.domains.BaseEntity;
-import com.mamalimomen.base.services.dtos.BaseDTO;
+import com.mamalimomen.base.dtos.BaseDTO;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface BaseRepository<PK extends Number, E extends BaseEntity<PK>, D extends BaseDTO<PK>> {
+public interface BaseRepository<PK extends Number, E extends BaseEntity<PK>, D extends BaseDTO<Long>> {
     void closeEntityManger();
 
     boolean saveOne(E e);

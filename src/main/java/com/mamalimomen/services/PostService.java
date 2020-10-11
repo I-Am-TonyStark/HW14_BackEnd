@@ -2,23 +2,21 @@ package com.mamalimomen.services;
 
 import com.mamalimomen.base.services.BaseService;
 import com.mamalimomen.domains.Post;
-import com.mamalimomen.services.dtos.PostDTO;
+import com.mamalimomen.dtos.PostDTO;
+import com.mamalimomen.dtos.PostSearchDTO;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface PostService extends BaseService<Long, Post, PostDTO> {
-    Optional<Post> createNewPost();
+public interface PostService extends BaseService<Long, Post, PostSearchDTO> {
+    boolean createNewPost(PostDTO dto);
 
-    Optional<Post> retrieveExistPost();
+    List<PostDTO> retrieveManyExistPosts(PostDTO dto);
 
-    List<Post> retrieveManyExistPosts();
+    List<PostDTO> retrieveAllExistPosts();
 
-    List<Post> retrieveAllExistPosts();
+    boolean updateExistPost(PostDTO dto);
 
-    String updateExistPost();
+    boolean deleteExistPost(PostDTO dto);
 
-    String deleteExistPost();
-
-    List<Post> postAdvancedSearch();
+    List<PostDTO> postAdvancedSearch();
 }

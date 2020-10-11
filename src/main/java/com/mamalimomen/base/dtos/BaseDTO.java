@@ -1,4 +1,4 @@
-package com.mamalimomen.base.services.dtos;
+package com.mamalimomen.base.dtos;
 
 import java.io.Serializable;
 

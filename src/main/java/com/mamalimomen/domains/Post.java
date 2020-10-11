@@ -1,6 +1,8 @@
 package com.mamalimomen.domains;
 
 import com.mamalimomen.base.domains.BaseEntity;
+import com.mamalimomen.dtos.AccountDTO;
+import com.mamalimomen.dtos.PostDTO;
 import org.hibernate.annotations.SelectBeforeUpdate;
 
 import javax.persistence.*;
@@ -14,15 +16,15 @@ import java.util.Date;
                 query = "SELECT p FROM Post p"),
         @NamedQuery(
                 name = "Post.findManyByAccountUsername",
-                query = "SELECT p FROM Post p JOIN p.account a WHERE a.user.username = ?1")
+                query = "SELECT p FROM Post p JOIN p.account a WHERE a.user.username = ?1 ORDER BY p.insertDate ASC"),
+        @NamedQuery(
+                name = "Post.findFetchManyByAccountUsernameLike",
+                query = "SELECT p FROM Post p JOIN FETCH p.account a WHERE a.user.username like ?1")
 })
 public class Post extends BaseEntity<Long> implements Comparable<Post> {
 
     @Transient
     private static final long serialVersionUID = 6446817660773091639L;
-
-    @Transient
-    private static long count = 1;
 
     @Column(name = "text", nullable = false, columnDefinition = "text")
     private String text;
@@ -34,11 +36,6 @@ public class Post extends BaseEntity<Long> implements Comparable<Post> {
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_account", nullable = false, updatable = false)
     private Account account;
-
-    public Post() {
-        this.setId(count);
-        count++;
-    }
 
     public String getText() {
         return text;
@@ -70,20 +67,37 @@ public class Post extends BaseEntity<Long> implements Comparable<Post> {
     }
 
     @Override
-    public String toString() {
-        return String.format("Account Number: %s%nOwner Customer: %s%nBalance amount: %,+011.2f Rials%n", );
-    }
-
-    public void printCompleteInformation() {
-        System.out.printf("Account Number: %s%nIs Active: %b%nBalance amount: %,+011.2f Rials%nOwner: %s%nOpen Date: %s%nCredit Card: %s%n",
-                );
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Post post = (Post) obj;
         return this.hashCode() == post.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getId().intValue();
+    }
+
+    public Post copyMeFrom(PostDTO postDTO) {
+        Account account = new Account();
+        account.setId(postDTO.getAccount().getId());
+
+        this.setText(postDTO.getText());
+        this.setInsertDate(postDTO.getInsertDate());
+        this.setAccount(account);
+        return this;
+    }
+
+    public PostDTO copyMeTo() {
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setId(this.getAccount().getId());
+
+        PostDTO dto = new PostDTO();
+        dto.setId(this.getId());
+        dto.setAccount(accountDTO);
+        dto.setInsertDate(this.getInsertDate());
+        dto.setText(this.getText());
+        return dto;
     }
 }

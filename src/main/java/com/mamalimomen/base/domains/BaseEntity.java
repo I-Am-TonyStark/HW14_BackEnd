@@ -1,9 +1,6 @@
 package com.mamalimomen.base.domains;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @MappedSuperclass
@@ -13,6 +10,7 @@ public abstract class BaseEntity<PK extends Number> implements Serializable {
     private static final long serialVersionUID = -4281565028591599756L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", updatable = false, nullable = false, unique = true)
     private PK id;
 

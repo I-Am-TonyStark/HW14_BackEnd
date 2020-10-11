@@ -1,10 +1,12 @@
-package com.mamalimomen.services.dtos;
+package com.mamalimomen.dtos;
 
-import com.mamalimomen.base.services.dtos.BaseDTO;
+import com.mamalimomen.base.dtos.BaseDTO;
 
 import java.util.Date;
 
-public class PostDTO extends BaseDTO<Long> {
+public class PostSearchDTO extends BaseDTO<Long> {
+
+    private static final long serialVersionUID = 1033764190288685994L;
 
     private String text;
     private Date fromDate;

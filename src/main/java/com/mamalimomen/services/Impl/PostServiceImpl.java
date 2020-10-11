@@ -2,52 +2,58 @@ package com.mamalimomen.services.Impl;
 
 import com.mamalimomen.base.services.impl.BaseServiceImpl;
 import com.mamalimomen.domains.Post;
+import com.mamalimomen.dtos.PostDTO;
+import com.mamalimomen.dtos.PostSearchDTO;
 import com.mamalimomen.repositories.PostRepository;
 import com.mamalimomen.repositories.impl.PostRepositoryImpl;
 import com.mamalimomen.services.PostService;
-import com.mamalimomen.services.dtos.PostDTO;
 
 import javax.persistence.EntityManager;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
 
-public class PostServiceImpl extends BaseServiceImpl<Long, Post, PostDTO, PostRepository> implements PostService {
+public class PostServiceImpl extends BaseServiceImpl<Long, Post, PostSearchDTO, PostRepository> implements PostService {
     public PostServiceImpl(EntityManager em) {
         super(new PostRepositoryImpl(em));
     }
 
+    private final Function<Post, PostDTO> postChanger = Post::copyMeTo;
+
     @Override
-    public Optional<Post> createNewPost() {
-        return Optional.empty();
+    public boolean createNewPost(PostDTO dto) {
+        Post post = new Post();
+
+        return saveOne(post.copyMeFrom(dto));
     }
 
     @Override
-    public Optional<Post> retrieveExistPost() {
-        return Optional.empty();
+    public List<PostDTO> retrieveManyExistPosts(PostDTO dto) {
+        return repository.findManyPostsByAccountUsername(dto.getAccount().getUser().getUsername(), postChanger);
     }
 
     @Override
-    public List<Post> retrieveManyExistPosts() {
-        return null;
+    public List<PostDTO> retrieveAllExistPosts() {
+        return repository.findAllPosts(postChanger);
     }
 
     @Override
-    public List<Post> retrieveAllExistPosts() {
-        return null;
+    public boolean updateExistPost(PostDTO dto) {
+        Post post = new Post();
+        post.setId(dto.getId());
+
+        return updateOne(post.copyMeFrom(dto));
     }
 
     @Override
-    public String updateExistPost() {
-        return null;
+    public boolean deleteExistPost(PostDTO dto) {
+        Post post = new Post();
+        post.setId(dto.getId());
+
+        return deleteOne(post);
     }
 
     @Override
-    public String deleteExistPost() {
-        return null;
-    }
-
-    @Override
-    public List<Post> postAdvancedSearch() {
+    public List<PostDTO> postAdvancedSearch() {
         return null;
     }
 }

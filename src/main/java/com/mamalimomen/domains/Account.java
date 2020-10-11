@@ -22,16 +22,8 @@ public final class Account extends BaseEntity<Long> implements Comparable<Accoun
     @Transient
     private static final long serialVersionUID = 8296892016184394238L;
 
-    @Transient
-    private static long count = 1;
-
     @Embedded
     private User user;
-
-    public Account() {
-        this.setId(count);
-        count++;
-    }
 
     public User getUser() {
         return user;
@@ -47,20 +39,15 @@ public final class Account extends BaseEntity<Long> implements Comparable<Accoun
     }
 
     @Override
-    public String toString() {
-        return String.format("Account Number: %s%nOwner Customer: %s%nBalance amount: %,+011.2f Rials%n", );
-    }
-
-    public void printCompleteInformation() {
-        System.out.printf("Account Number: %s%nIs Active: %b%nBalance amount: %,+011.2f Rials%nOwner: %s%nOpen Date: %s%nCredit Card: %s%n",
-                );
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Account account = (Account) obj;
         return this.hashCode() == account.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getId().intValue();
     }
 }

@@ -1,8 +1,10 @@
-package com.mamalimomen.services.dtos;
+package com.mamalimomen.dtos;
 
-import com.mamalimomen.base.services.dtos.BaseDTO;
+import com.mamalimomen.base.dtos.BaseDTO;
 
-public class AccountDTO extends BaseDTO<Long> {
+public class AccountSearchDTO extends BaseDTO<Long> {
+
+    private static final long serialVersionUID = -6558108268012383341L;
 
     private String username;
     private String ownerFirstName;

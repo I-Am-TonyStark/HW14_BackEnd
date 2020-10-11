@@ -2,52 +2,72 @@ package com.mamalimomen.services.Impl;
 
 import com.mamalimomen.base.services.impl.BaseServiceImpl;
 import com.mamalimomen.domains.Account;
+import com.mamalimomen.domains.User;
+import com.mamalimomen.dtos.AccountDTO;
+import com.mamalimomen.dtos.AccountSearchDTO;
+import com.mamalimomen.dtos.UserDTO;
 import com.mamalimomen.repositories.AccountRepository;
 import com.mamalimomen.repositories.impl.AccountRepositoryImpl;
 import com.mamalimomen.services.AccountService;
-import com.mamalimomen.services.dtos.AccountDTO;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountDTO, AccountRepository> implements AccountService {
+public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountSearchDTO, AccountRepository> implements AccountService {
     public AccountServiceImpl(EntityManager em) {
         super(new AccountRepositoryImpl(em));
     }
 
     @Override
-    public Optional<Account> createNewAccount() {
-        return Optional.empty();
+    public boolean createNewAccount(AccountDTO dto) {
+        User user = new User();
+        user.copyMeFrom(dto.getUser());
+
+        Account account = new Account();
+        account.setUser(user);
+
+        return saveOne(account);
     }
 
     @Override
-    public Optional<Account> retrieveExistAccount() {
-        return Optional.empty();
+    public Optional<AccountDTO> retrieveExistActiveAccount(AccountDTO dto) {
+        Optional<Account> oAccount = repository.findOneActiveAccountByUsername(dto.getUser().getUsername());
+
+        if (oAccount.isPresent()) {
+            Account account = oAccount.get();
+            UserDTO userDTO = account.getUser().copyMeTo();
+            dto.setId(account.getId());
+            dto.setUser(userDTO);
+        } else {
+            return Optional.empty();
+        }
+
+        return Optional.of(dto);
     }
 
     @Override
-    public Optional<Account> retrieveExistActiveAccount() {
-        return Optional.empty();
+    public boolean updateExistActiveAccount(AccountDTO dto) {
+        User user = new User();
+        user.copyMeFrom(dto.getUser());
+
+        Account account = new Account();
+        account.setId(dto.getId());
+        account.setUser(user);
+
+        return updateOne(account);
     }
 
     @Override
-    public String updateExistActiveAccountPassword() {
-        return null;
+    public boolean deleteExistActiveAccount(AccountDTO dto) {
+        Account account = new Account();
+        account.setId(dto.getId());
+
+        return deleteOne(account);
     }
 
     @Override
-    public String updateExistActiveAccountInformation() {
-        return null;
-    }
-
-    @Override
-    public String deleteExistActiveAccount() {
-        return null;
-    }
-
-    @Override
-    public List<Account> accountAdvancedSearch() {
+    public List<AccountDTO> accountAdvancedSearch() {
         return null;
     }
 }
