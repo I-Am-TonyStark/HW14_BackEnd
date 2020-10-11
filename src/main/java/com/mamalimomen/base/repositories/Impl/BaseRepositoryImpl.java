@@ -2,12 +2,18 @@ package com.mamalimomen.base.repositories.Impl;
 
 import com.mamalimomen.base.domains.BaseEntity;
 import com.mamalimomen.base.repositories.BaseRepository;
+import com.mamalimomen.base.services.dtos.BaseDTO;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class BaseRepositoryImpl<PK extends Number, E extends BaseEntity<PK>> implements BaseRepository<PK, E> {
+public abstract class BaseRepositoryImpl<PK extends Number, E extends BaseEntity<PK>, D extends BaseDTO<PK>> implements BaseRepository<PK, E, D> {
     private final EntityManager em;
 
     public BaseRepositoryImpl(EntityManager em) {
@@ -162,4 +168,19 @@ public abstract class BaseRepositoryImpl<PK extends Number, E extends BaseEntity
         return em.createNamedQuery(namedQuery, c)
                 .getResultList();
     }
+
+    @Override
+    public <T> List<T> advancedSearch(D dto, Class<T> resultClass, Class<E> entityClass) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<T> query = cb.createQuery(resultClass);
+        Root<E> root = query.from(entityClass);
+
+        List<Predicate> predicates = new ArrayList<>();
+        setClausesForAdvancedSearch(dto, predicates, cb, root);
+
+        query.where(cb.and(predicates.toArray(new Predicate[0])));
+        return em.createQuery(query).getResultList();
+    }
+
+    protected abstract void setClausesForAdvancedSearch(D dto, List<Predicate> predicates, CriteriaBuilder cb, Root<E> root);
 }

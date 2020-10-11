@@ -5,12 +5,13 @@ import com.mamalimomen.domains.Post;
 import com.mamalimomen.repositories.PostRepository;
 import com.mamalimomen.repositories.impl.PostRepositoryImpl;
 import com.mamalimomen.services.PostService;
+import com.mamalimomen.services.dtos.PostDTO;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-public class PostServiceImpl extends BaseServiceImpl<Long, Post, PostRepository> implements PostService {
+public class PostServiceImpl extends BaseServiceImpl<Long, Post, PostDTO, PostRepository> implements PostService {
     public PostServiceImpl(EntityManager em) {
         super(new PostRepositoryImpl(em));
     }
@@ -42,6 +43,11 @@ public class PostServiceImpl extends BaseServiceImpl<Long, Post, PostRepository>
 
     @Override
     public String deleteExistPost() {
+        return null;
+    }
+
+    @Override
+    public List<Post> postAdvancedSearch() {
         return null;
     }
 }

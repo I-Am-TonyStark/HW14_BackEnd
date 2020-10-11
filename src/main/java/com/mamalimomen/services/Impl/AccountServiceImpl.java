@@ -5,11 +5,13 @@ import com.mamalimomen.domains.Account;
 import com.mamalimomen.repositories.AccountRepository;
 import com.mamalimomen.repositories.impl.AccountRepositoryImpl;
 import com.mamalimomen.services.AccountService;
+import com.mamalimomen.services.dtos.AccountDTO;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 import java.util.Optional;
 
-public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountRepository> implements AccountService {
+public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountDTO, AccountRepository> implements AccountService {
     public AccountServiceImpl(EntityManager em) {
         super(new AccountRepositoryImpl(em));
     }
@@ -41,6 +43,11 @@ public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountRe
 
     @Override
     public String deleteExistActiveAccount() {
+        return null;
+    }
+
+    @Override
+    public List<Account> accountAdvancedSearch() {
         return null;
     }
 }

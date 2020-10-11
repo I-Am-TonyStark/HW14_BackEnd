@@ -1,11 +1,12 @@
 package com.mamalimomen.base.repositories;
 
 import com.mamalimomen.base.domains.BaseEntity;
+import com.mamalimomen.base.services.dtos.BaseDTO;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface BaseRepository<PK extends Number, E extends BaseEntity<PK>> {
+public interface BaseRepository<PK extends Number, E extends BaseEntity<PK>, D extends BaseDTO<PK>> {
     void closeEntityManger();
 
     boolean saveOne(E e);
@@ -27,4 +28,6 @@ public interface BaseRepository<PK extends Number, E extends BaseEntity<PK>> {
     List<E> findManyByNamedQuery(String namedQuery, Class<E> c, Object... parameters);
 
     List<E> findAllByNamedQuery(String namedQuery, Class<E> c);
+
+    <T> List<T> advancedSearch(D dto, Class<T> resultClass, Class<E> entityClass);
 }
