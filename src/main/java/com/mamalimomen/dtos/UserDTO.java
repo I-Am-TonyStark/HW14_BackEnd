@@ -1,6 +1,7 @@
 package com.mamalimomen.dtos;
 
 import com.mamalimomen.base.controllers.utilities.InValidDataException;
+import com.mamalimomen.base.controllers.utilities.SecurityManager;
 
 import java.io.Serializable;
 
@@ -44,7 +45,10 @@ public final class UserDTO implements Serializable {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(String username) throws InValidDataException {
+        if (!password.matches("[a-zA-Z0-9]{3,}")) {
+            throw new InValidDataException("Password");
+        }
         this.username = username;
     }
 
@@ -56,7 +60,7 @@ public final class UserDTO implements Serializable {
         if (!password.matches("[a-zA-Z0-9]{3,}")) {
             throw new InValidDataException("Password");
         }
-        this.password = password;
+        this.password = SecurityManager.getPasswordHash(password);
     }
 
     public String getAboutMe() {

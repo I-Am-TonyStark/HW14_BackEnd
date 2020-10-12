@@ -1,9 +1,8 @@
 package com.mamalimomen.dtos;
 
 import com.mamalimomen.base.dtos.BaseDTO;
-import com.mamalimomen.domains.Account;
 
-public final class AccountDTO extends BaseDTO<Long> implements Comparable<Account> {
+public final class AccountDTO extends BaseDTO<Long> implements Comparable<AccountDTO> {
 
     private static final long serialVersionUID = -1541995039780498705L;
 
@@ -36,7 +35,7 @@ public final class AccountDTO extends BaseDTO<Long> implements Comparable<Accoun
     }
 
     @Override
-    public int compareTo(Account a) {
+    public int compareTo(AccountDTO a) {
         return this.getId().compareTo(a.getId());
     }
 }

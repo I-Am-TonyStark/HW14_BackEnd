@@ -1,11 +1,11 @@
 package com.mamalimomen.dtos;
 
+import com.mamalimomen.base.controllers.utilities.InValidDataException;
 import com.mamalimomen.base.dtos.BaseDTO;
-import com.mamalimomen.domains.Post;
 
 import java.util.Date;
 
-public final class PostDTO extends BaseDTO<Long> implements Comparable<Post> {
+public final class PostDTO extends BaseDTO<Long> implements Comparable<PostDTO> {
 
     private static final long serialVersionUID = 3156033230431579881L;
 
@@ -17,7 +17,10 @@ public final class PostDTO extends BaseDTO<Long> implements Comparable<Post> {
         return text;
     }
 
-    public void setText(String text) {
+    public void setText(String text) throws InValidDataException {
+        if (text.length() < 20) {
+            throw new InValidDataException("Text");
+        }
         this.text = text;
     }
 
@@ -60,7 +63,7 @@ public final class PostDTO extends BaseDTO<Long> implements Comparable<Post> {
     }
 
     @Override
-    public int compareTo(Post p) {
+    public int compareTo(PostDTO p) {
         return this.getInsertDate().compareTo(p.getInsertDate());
     }
 }

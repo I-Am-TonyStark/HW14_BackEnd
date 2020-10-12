@@ -71,9 +71,12 @@ public final class MAMPParser {
     }
 
     private static synchronized Object retrieveRequestParser(MAMP<? extends BaseDTO<Long>> request) {
+
         if (request.getDtoClass().equals(AccountDTO.class)) {
+
             if (request.getCount() == Count.ONE) {
                 Optional<AccountDTO> oAccountDTO = accountService.retrieveExistActiveAccount((AccountDTO) request.getData());
+
                 if (oAccountDTO.isPresent()) {
                     return oAccountDTO.get();
                 } else {
