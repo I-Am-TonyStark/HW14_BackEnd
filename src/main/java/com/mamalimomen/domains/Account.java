@@ -1,14 +1,11 @@
 package com.mamalimomen.domains;
 
 import com.mamalimomen.base.domains.BaseEntity;
-import org.hibernate.annotations.SelectBeforeUpdate;
 
 import javax.persistence.*;
 
 @Entity
-@SelectBeforeUpdate
-@Table(name = "tbl_account", catalog = "HW13_One", schema = "HW13_One",
-uniqueConstraints = {@UniqueConstraint(name = "unique_account_username",columnNames = {"id","username"})})
+@Table(name = "tbl_account", catalog = "HW13_One", schema = "HW13_One")
 @NamedQueries({
         @NamedQuery(
                 name = "Account.findOneByUsername",
@@ -17,7 +14,7 @@ uniqueConstraints = {@UniqueConstraint(name = "unique_account_username",columnNa
                 name = "Account.findOneActiveByUsername",
                 query = "SELECT a FROM Account a WHERE a.deleted = FALSE AND a.user.username = ?1")
 })
-public final class Account extends BaseEntity<Long> implements Comparable<Account> {
+public final class Account extends BaseEntity implements Comparable<Account> {
 
     @Transient
     private static final long serialVersionUID = 8296892016184394238L;

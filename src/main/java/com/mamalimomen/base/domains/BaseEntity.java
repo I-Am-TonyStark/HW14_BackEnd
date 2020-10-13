@@ -4,24 +4,31 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @MappedSuperclass
-public abstract class BaseEntity<PK extends Number> implements Serializable {
+public abstract class BaseEntity implements Serializable {
 
     @Transient
     private static final long serialVersionUID = -4281565028591599756L;
 
+    @Transient
+    private static Long count = 1L;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", updatable = false, nullable = false, unique = true)
-    private PK id;
+    private Long id;
 
     @Column(name = "is_deleted", nullable = false)
     private Boolean deleted = false;
 
-    public PK getId() {
+    public BaseEntity(){
+        this.id = count;
+        count++;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(PK id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

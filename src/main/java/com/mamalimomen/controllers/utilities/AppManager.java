@@ -14,14 +14,14 @@ import java.util.*;
 
 public final class AppManager {
     private static final List<EntityManager> emList = new ArrayList<>();
-    private static final Map<Services, BaseService<? extends Number, ? extends BaseEntity<? extends Number>, ? extends BaseDTO<? extends Number>>> serviceMapper = new HashMap<>();
+    private static final Map<Services, BaseService<? extends Long, ? extends BaseEntity, ? extends BaseDTO<? extends Number>>> serviceMapper = new HashMap<>();
     private static ServerManager serverManager;
     private static final Scanner sc = new Scanner(System.in);
 
     private AppManager() {
     }
 
-    public static synchronized void startApp() {
+    public synchronized static void startApp() {
         EntityManager em = PersistenceUnitManager.getEntityManager(PersistenceUnits.UNIT_ONE);
 
         emList.add(em);
@@ -33,13 +33,13 @@ public final class AppManager {
 
         while (true) {
             String turnOffOrder = sc.nextLine();
-            if (turnOffOrder.equalsIgnoreCase("off")) {
+            if (turnOffOrder.equals("OFF")) {
                 break;
             }
         }
     }
 
-    public static synchronized <PK extends Number, E extends BaseEntity<PK>, D extends BaseDTO<Long>, S extends BaseService<PK, E, D>> S getService(Services service) {
+    public static <PK extends Long, E extends BaseEntity, D extends BaseDTO<Long>, S extends BaseService<PK, E, D>> S getService(Services service) {
         return (S) serviceMapper.get(service);
     }
 

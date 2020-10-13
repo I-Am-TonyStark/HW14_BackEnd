@@ -7,8 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashSet;
 import java.util.Optional;
-import java.util.Stack;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
@@ -17,13 +18,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public final class ServerManager {
     private ServerSocket serverSocket;
-    private final Stack<ClientThread> clients = new Stack<>();
+    private final Set<ClientThread> clients = new HashSet<>();
 
     private final short port = 8000;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     public ServerManager() {
-        this.turnOnServer();
+        executorService.execute(this::turnOnServer);
     }
 
     private void turnOnServer() {
@@ -34,12 +35,13 @@ public final class ServerManager {
             while (true) {
                 Socket socket = serverSocket.accept();
                 ClientThread client = new ClientThread(socket);
-                clients.push(client);
+                clients.add(client);
+                System.err.println("One client connected!");
                 System.err.println("Current clients count : " + clients.size());
                 executorService.execute(client);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Server is shutting down...");
         }
     }
 
@@ -49,6 +51,7 @@ public final class ServerManager {
                 client.closeClient();
             }
             serverSocket.close();
+            executorService.shutdownNow();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,6 +67,7 @@ public final class ServerManager {
         private final Condition canTalk = accessLock.newCondition();
         private final Condition canListen = accessLock.newCondition();
         private boolean occupiedBuffer = false;
+        private boolean connected = true;
 
         ClientThread(Socket socket) throws IOException {
             this.socket = socket;
@@ -81,14 +85,22 @@ public final class ServerManager {
             while (true) {
                 accessLock.lock();
                 try {
-                    while (occupiedBuffer) {
+                    while (occupiedBuffer && connected) {
                         canListen.await();
+                    }
+                    if(!connected){
+                        break;
                     }
                     buffer = Optional.of(MAMPParser.parse((MAMP<? extends BaseDTO<Long>>) inputObject.readObject()));
                     occupiedBuffer = true;
                     canTalk.signalAll();
                 } catch (IOException | ClassNotFoundException | InterruptedException e) {
-                    e.printStackTrace();
+                    clients.remove(this);
+                    System.err.println("One client disconnected!");
+                    System.err.println("Current clients count : " + clients.size());
+                    connected = false;
+                    canTalk.signalAll();
+                    break;
                 } finally {
                     accessLock.unlock();
                 }
@@ -99,15 +111,23 @@ public final class ServerManager {
             while (true) {
                 accessLock.lock();
                 try {
-                    while (!occupiedBuffer) {
+                    while (!occupiedBuffer && connected) {
                         canTalk.await();
+                    }
+                    if(!connected){
+                        break;
                     }
                     occupiedBuffer = false;
                     outputObject.writeObject(buffer.get());
                     buffer = Optional.empty();
                     canListen.signalAll();
                 } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
+                    clients.remove(this);
+                    System.err.println("One client disconnected!");
+                    System.err.println("Current clients count : " + clients.size());
+                    connected = false;
+                    canListen.signalAll();
+                    break;
                 } finally {
                     accessLock.unlock();
                 }

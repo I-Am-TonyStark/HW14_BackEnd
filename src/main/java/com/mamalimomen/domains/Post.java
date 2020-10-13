@@ -1,15 +1,15 @@
 package com.mamalimomen.domains;
 
+import com.mamalimomen.base.controllers.utilities.InValidDataException;
 import com.mamalimomen.base.domains.BaseEntity;
 import com.mamalimomen.dtos.AccountDTO;
 import com.mamalimomen.dtos.PostDTO;
-import org.hibernate.annotations.SelectBeforeUpdate;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@SelectBeforeUpdate
+@Table(name = "tbl_post", catalog = "HW13_One", schema = "HW13_One")
 @NamedQueries({
         @NamedQuery(
                 name = "Post.findAll",
@@ -21,7 +21,7 @@ import java.util.Date;
                 name = "Post.findFetchManyByAccountUsernameLike",
                 query = "SELECT p FROM Post p JOIN FETCH p.account a WHERE a.user.username like ?1")
 })
-public class Post extends BaseEntity<Long> implements Comparable<Post> {
+public class Post extends BaseEntity implements Comparable<Post> {
 
     @Transient
     private static final long serialVersionUID = 6446817660773091639L;
@@ -97,7 +97,11 @@ public class Post extends BaseEntity<Long> implements Comparable<Post> {
         dto.setId(this.getId());
         dto.setAccount(accountDTO);
         dto.setInsertDate(this.getInsertDate());
-        dto.setText(this.getText());
+        try {
+            dto.setText(this.getText());
+        } catch (InValidDataException e) {
+            e.printStackTrace();
+        }
         return dto;
     }
 }

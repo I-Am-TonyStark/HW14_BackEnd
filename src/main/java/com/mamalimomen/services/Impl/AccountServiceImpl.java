@@ -52,8 +52,10 @@ public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountSe
         user.copyMeFrom(dto.getUser());
 
         Account account = new Account();
+        //System.out.println(account.getId() + "" + account);
         account.setId(dto.getId());
         account.setUser(user);
+        //System.out.println(account.getId() + "" + account);
 
         return updateOne(account);
     }
