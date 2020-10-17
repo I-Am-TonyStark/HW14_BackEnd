@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="HW13_BackEnd" />
+        <module name="HW14_BackEnd" />
       </profile>
     </annotationProcessing>
   </component>
