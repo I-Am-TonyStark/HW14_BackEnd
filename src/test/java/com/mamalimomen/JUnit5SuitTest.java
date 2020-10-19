@@ -5,12 +5,8 @@ import org.junit.platform.suite.api.IncludeTags;
 import org.junit.platform.suite.api.SelectPackages;
 import org.junit.runner.RunWith;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
 @RunWith(JUnitPlatform.class)
 @SelectPackages({"com.mamalimomen"})
-@IncludeTags({"repository"})
+@IncludeTags({"repository", "service"})
 public class JUnit5SuitTest {
-    public static EntityManagerFactory  emf = Persistence.createEntityManagerFactory("persistence-unit-one");
 }

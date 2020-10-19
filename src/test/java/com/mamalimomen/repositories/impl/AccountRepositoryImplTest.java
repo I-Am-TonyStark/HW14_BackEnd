@@ -1,8 +1,7 @@
 package com.mamalimomen.repositories.impl;
 
-import com.mamalimomen.JUnit5SuitTest;
+import com.mamalimomen.base.controllers.utilities.InValidDataException;
 import com.mamalimomen.domains.Account;
-import com.mamalimomen.domains.Post;
 import com.mamalimomen.domains.User;
 import com.mamalimomen.repositories.AccountRepository;
 import org.junit.jupiter.api.*;
@@ -10,7 +9,7 @@ import org.junit.jupiter.api.*;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -18,98 +17,105 @@ import static junit.framework.TestCase.*;
 
 @Tag("repository")
 class AccountRepositoryImplTest {
-    public static User user;
-    public static User user2;
-    public static Account account;
-    public static Account account2;
-    static long time;
-    static EntityManager em;
-    static AccountRepository accountRepository;
+    static EntityManagerFactory emf;
+    AccountRepository ar;
+    EntityManager em;
 
     @BeforeAll
     static void beforeAll() {
-        try {
-            em = JUnit5SuitTest.emf.createEntityManager();
-            accountRepository = new AccountRepositoryImpl(em);
+        emf = Persistence.createEntityManagerFactory("persistence-unit-one");
+    }
 
-            user = new User();
-            account = new Account();
-            user.setPassword("test");
-            user.setUsername("test");
-            user.setFirstName("test");
-            user.setLastName("test");
-            user.setAboutMe("test");
-            account.setUser(user);
-            assertTrue(accountRepository.saveOne(account));
-
-            user2 = new User();
-            user2.setPassword("test");
-            user2.setUsername("test1");
-            user2.setFirstName("test");
-            user2.setLastName("test");
-            user2.setAboutMe("test");
-            account2 = new Account();
-            account2.setUser(user2);
-            assertTrue(accountRepository.saveOne(account2));
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+    @AfterAll
+    static void afterAll() {
+        emf.close();
     }
 
     @BeforeEach
     void beforeEach() {
-        time = System.nanoTime();
+        em = emf.createEntityManager();
+        ar = new AccountRepositoryImpl(em);
     }
 
     @AfterEach
     void afterEach() {
-        System.out.println((System.nanoTime() - time) / 1000000000.0);
+        ar.closeEntityManger();
+        ar = null;
     }
 
+
+    @Test
+    @Order(1)
+    @DisplayName("Find one active Account by username")
+    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
+    void findOneActiveAccountByUsernameTest() {
+        Optional<Account> oAccount1 = ar.findOneActiveAccountByUsername("test");
+        assertFalse(oAccount1.isPresent());
+
+        try{
+            User user = new User();
+            user.setAboutMe("test test test test test");
+            user.setFirstName("test");
+            user.setLastName("test");
+            user.setUsername("test");
+            user.setPassword("test");
+
+            Account account1 = new Account();
+            account1.setUser(user);
+            ar.saveOne(account1);
+
+            Optional<Account> oAccount2 = ar.findOneActiveAccountByUsername("test");
+            Account account2 = oAccount2.get();
+            assertEquals(account1,account2);
+
+            account2.setDeleted(true);
+            ar.updateOne(account2);
+            Optional<Account> oAccount3 = ar.findOneActiveAccountByUsername("test");
+            assertFalse(oAccount3.isPresent());
+
+            ar.deleteOne(account2);
+            Optional<Account> oAccount4 = ar.findOneActiveAccountByUsername("test");
+            assertFalse(oAccount4.isPresent());
+        }catch (InValidDataException| NoSuchElementException e){
+            fail();
+        }
+    }
 
     @Test
     @Order(2)
-    @DisplayName("Update One Account Test")
+    @DisplayName("Find one Account by username")
     @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
-    void updateOne() {
-        Optional<Account> oAccount = accountRepository.findOneActiveAccountByUsername("test");
-        Account account = oAccount.get();
-        account.getUser().setUsername("test2");
-        assertTrue(accountRepository.updateOne(account));
+    void findOneAccountByUsernameTest() {
+        Optional<Account> oAccount1 = ar.findOneAccountByUsername("test");
+        assertFalse(oAccount1.isPresent());
 
-        oAccount = accountRepository.findOneActiveAccountByUsername("test1");
-        account = oAccount.get();
-        account.getUser().setUsername("test2");
-        assertFalse(accountRepository.updateOne(account));
-    }
+        try{
+            User user = new User();
+            user.setAboutMe("test test test test test");
+            user.setFirstName("test");
+            user.setLastName("test");
+            user.setUsername("test");
+            user.setPassword("test");
 
-    @Test
-    @Order(3)
-    @DisplayName("Find Account by username Test")
-    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
-    void findOneActiveAccountByUsername() {
+            Account account1 = new Account();
+            account1.setUser(user);
+            ar.saveOne(account1);
 
-        Optional<Account> oTest = accountRepository.findOneActiveAccountByUsername("test");
-        assertTrue(oTest.isEmpty());
+            Optional<Account> oAccount2 = ar.findOneAccountByUsername("test");
+            Account account2 = oAccount2.get();
+            assertEquals(account1,account2);
 
-        Optional<Account> oTest1 = accountRepository.findOneActiveAccountByUsername("test1");
-        assertFalse(oTest1.isEmpty());
-    }
+            account2.setDeleted(true);
+            ar.updateOne(account2);
+            Optional<Account> oAccount3 = ar.findOneAccountByUsername("test");
+            Account account3 = oAccount3.get();
+            assertEquals(account2,account3);
 
-
-    @AfterAll
-    @DisplayName("Close EntityManager Test")
-    static void closeEntityManger() {
-        Optional<Account> oTest2 = accountRepository.findOneActiveAccountByUsername("test2");
-        Account account = oTest2.get();
-        assertTrue(accountRepository.deleteOne(account));
-
-        Optional<Account> oTest1 = accountRepository.findOneActiveAccountByUsername("test1");
-        account = oTest1.get();
-        assertTrue(accountRepository.deleteOne(account));
-
-        assertFalse(accountRepository.deleteOne(AccountRepositoryImplTest.account));
-
-        accountRepository.closeEntityManger();
+            ar.deleteOne(account3);
+            Optional<Account> oAccount4 = ar.findOneAccountByUsername("test");
+            assertFalse(oAccount4.isPresent());
+        }catch (InValidDataException| NoSuchElementException e){
+            fail();
+        }
     }
 }

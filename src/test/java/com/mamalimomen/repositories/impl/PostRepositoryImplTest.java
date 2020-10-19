@@ -1,10 +1,7 @@
 package com.mamalimomen.repositories.impl;
 
-import com.mamalimomen.JUnit5SuitTest;
-import com.mamalimomen.domains.Account;
+import com.mamalimomen.base.controllers.utilities.InValidDataException;
 import com.mamalimomen.domains.Post;
-import com.mamalimomen.domains.User;
-import com.mamalimomen.repositories.AccountRepository;
 import com.mamalimomen.repositories.PostRepository;
 import org.junit.jupiter.api.*;
 
@@ -13,108 +10,68 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.*;
 
 @Tag("repository")
 class PostRepositoryImplTest {
-    public static User user;
-    public static Account account;
-    public static Post post;
-    public static Post post2;
-    static long time;
-    static EntityManager em;
-    static PostRepository postRepository;
-    static AccountRepository accountRepository;
+    static EntityManagerFactory emf;
+    PostRepository pr;
+    EntityManager em;
 
     @BeforeAll
     static void beforeAll() {
-        try {
-            em = JUnit5SuitTest.emf.createEntityManager();
-            postRepository = new PostRepositoryImpl(em);
-            accountRepository = new AccountRepositoryImpl(em);
+        emf = Persistence.createEntityManagerFactory("persistence-unit-one");
+    }
 
-            user = new User();
-            account = new Account();
-            post = new Post();
-            post2 = new Post();
-
-            user.setPassword("test");
-            user.setUsername("test");
-            user.setFirstName("test");
-            user.setLastName("test");
-            user.setAboutMe("test");
-
-            account.setUser(user);
-
-            post.setText("test");
-            post.setInsertDate(new Date(System.currentTimeMillis()));
-            post.setAccount(account);
-
-            post2.setText("test");
-            post2.setInsertDate(new Date(System.currentTimeMillis()));
-            post2.setAccount(account);
-
-            accountRepository.saveOne(account);
-
-            assertTrue(postRepository.saveOne(post));
-            assertTrue(postRepository.saveOne(post2));
-        } catch (Throwable t) {
-            fail("exception");
-        }
+    @AfterAll
+    static void afterAll() {
+        emf.close();
     }
 
     @BeforeEach
     void beforeEach() {
-        time = System.nanoTime();
+        em = emf.createEntityManager();
+        pr = new PostRepositoryImpl(em);
     }
 
     @AfterEach
     void afterEach() {
-        System.out.println((System.nanoTime() - time) / 1000000000.0);
+        pr.closeEntityManger();
+        pr = null;
     }
 
     @Test
-    @Order(2)
-    @DisplayName("Update One Account Test")
-    void updateOne() {
-        List<Post> posts = postRepository.findManyPostsByAccountUsername("test");
-        Post post = posts.get(0);
-        post.setText("test test");
-        assertTrue(postRepository.updateOne(post));
+    @Order(1)
+    @DisplayName("Find all Posts")
+    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
+    void findAllPostsTest() {
+        List<Post> posts = pr.findAllPosts();
+        assertTrue(posts.isEmpty());
 
-        post = posts.get(1);
-        post.setText("test test");
-        assertTrue(postRepository.updateOne(post));
-    }
+        try {
+            Post post = new Post();
+            post.setImagePath("test://test/test/test/test");
+            post.setCreateDate(new Date(System.currentTimeMillis()));
+            post.setText("text text text text");
 
-    @Test
-    @Order(3)
-    @DisplayName("Find All Posts Test")
-    void findAllPosts() {
-        List<Post> posts = postRepository.findAllPosts();
-        assertFalse(posts.isEmpty());
-    }
+            pr.saveOne(post);
 
-    @Test
-    @Order(4)
-    @DisplayName("Find Many Posts Test")
-    void findManyPostsByAccountUsername() {
-        List<Post> posts = postRepository.findManyPostsByAccountUsername("test");
-        assertFalse(posts.isEmpty());
-    }
+            posts = pr.findAllPosts();
+            Post post2 = posts.get(0);
+            assertEquals(post, post2);
 
-    @AfterAll
-    @DisplayName("Close EntityManager Test")
-    static void closeEntityManger() {
-        List<Post> posts = postRepository.findManyPostsByAccountUsername("test");
-        assertTrue(postRepository.deleteOne(posts.get(0)));
+            post2.setDeleted(true);
+            pr.updateOne(post2);
+            posts = pr.findAllPosts();
+            assertTrue(posts.isEmpty());
 
-        assertTrue(postRepository.deleteOne(posts.get(1)));
-
-        assertFalse(postRepository.deleteOne(post));
-
-        accountRepository.deleteOne(account);
-        postRepository.closeEntityManger();
+            pr.deleteOne(post2);
+            posts = pr.findAllPosts();
+            assertTrue(posts.isEmpty());
+        } catch (InValidDataException e) {
+            fail();
+        }
     }
 }

@@ -21,7 +21,7 @@ public class CommentServiceImpl extends BaseServiceImpl<Long, Comment, CommentRe
     @Override
     public Optional<Comment> createNewComment(Account writer) {
         Comment comment = new Comment();
-        
+
         DialogProvider.createAndShowTerminalMessage("%s", "Message: ");
         String message = SingletonScanner.readParagraph();
         if (message.equalsIgnoreCase("esc")) {

@@ -13,7 +13,6 @@ public class PostRepositoryImpl extends BaseRepositoryImpl<Long, Post> implement
         super(em);
     }
 
-
     @Override
     public List<Post> findAllPosts() {
         return findAllByNamedQuery("Post.findAll", Post.class);
