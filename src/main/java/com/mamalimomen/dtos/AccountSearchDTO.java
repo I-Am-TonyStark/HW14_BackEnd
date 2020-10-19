@@ -2,7 +2,7 @@ package com.mamalimomen.dtos;
 
 import com.mamalimomen.base.dtos.BaseDTO;
 
-public class AccountSearchDTO extends BaseDTO {
+public class AccountSearchDTO extends BaseDTO<Long> {
 
     private static final long serialVersionUID = -6558108268012383341L;
 

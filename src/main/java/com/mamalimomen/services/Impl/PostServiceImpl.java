@@ -1,58 +1,83 @@
 package com.mamalimomen.services.Impl;
 
+import com.mamalimomen.base.controllers.guis.DialogProvider;
+import com.mamalimomen.base.controllers.utilities.InValidDataException;
+import com.mamalimomen.base.controllers.utilities.SingletonScanner;
 import com.mamalimomen.base.services.impl.BaseServiceImpl;
-import com.mamalimomen.domains.Account;
 import com.mamalimomen.domains.Post;
-import com.mamalimomen.dtos.PostDTO;
-import com.mamalimomen.dtos.PostSearchDTO;
 import com.mamalimomen.repositories.PostRepository;
 import com.mamalimomen.repositories.impl.PostRepositoryImpl;
 import com.mamalimomen.services.PostService;
 
 import javax.persistence.EntityManager;
+import java.util.Date;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Optional;
 
-public class PostServiceImpl extends BaseServiceImpl<Long, Post, PostSearchDTO, PostRepository> implements PostService {
+public class PostServiceImpl extends BaseServiceImpl<Long, Post, PostRepository> implements PostService {
     public PostServiceImpl(EntityManager em) {
         super(new PostRepositoryImpl(em));
     }
 
-    private final Function<Post, PostDTO> postChanger = Post::copyMeTo;
-
     @Override
-    public boolean createNewPost(PostDTO dto) {
+    public Optional<Post> createNewPost() {
         Post post = new Post();
+        while (true) {
+            try {
+                DialogProvider.createAndShowTerminalMessage("%s", "Text: ");
+                String text = SingletonScanner.readParagraph();
+                if (text.equalsIgnoreCase("esc")) {
+                    break;
+                }
+                post.setText(text);
 
-        return saveOne(post.copyMeFrom(dto));
+                DialogProvider.createAndShowTerminalMessage("%s", "Image Path: ");
+                String imagePath = SingletonScanner.readLine();
+                if (!imagePath.equalsIgnoreCase("pass")) {
+                    post.setImagePath(imagePath);
+                }
+
+                post.setCreateDate(new Date(System.currentTimeMillis()));
+
+                return Optional.of(post);
+            } catch (InValidDataException e) {
+                DialogProvider.createAndShowTerminalMessage("%s %s%s%n%n", "Wrong entered data format for", e.getMessage(), "!");
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
-    public List<PostDTO> retrieveManyExistPosts(PostDTO dto) {
-        return repository.findManyPostsByAccountUsername(dto.getAccount().getUser().getUsername(), postChanger);
+    public List<Post> retrieveAllExistPostsOrderByLike() {
+        return repository.findAllPosts();
     }
 
     @Override
-    public List<PostDTO> retrieveAllExistPosts() {
-        return repository.findAllPosts(postChanger);
-    }
+    public String updateExistPost(Post post) {
+        while (true) {
+            try {
+                DialogProvider.createAndShowTerminalMessage("%s (old = %s): ", "New Text", post.getText());
+                String newText = SingletonScanner.readParagraph();
+                if (newText.equalsIgnoreCase("esc")) {
+                    break;
+                }
+                post.setText(newText);
 
-    @Override
-    public boolean updateExistPost(PostDTO dto) {
-        Post post  = findOneById(Post.class,dto.getId()).get();
+                DialogProvider.createAndShowTerminalMessage("%s (old = %s): ", "New Image path", post.getImagePath());
+                String newImagePath = SingletonScanner.readLine();
+                if (!newImagePath.equalsIgnoreCase("pass")) {
+                    post.setImagePath(newImagePath);
+                }
 
-        return updateOne(post.copyMeFrom(dto));
-    }
-
-    @Override
-    public boolean deleteExistPost(PostDTO dto) {
-        Post post = findOneById(Post.class,dto.getId()).get();
-
-        return deleteOne(post);
-    }
-
-    @Override
-    public List<PostDTO> postAdvancedSearch() {
-        return null;
+                if (repository.updateOne(post)) {
+                    return "update selected post successfully!";
+                } else {
+                    return "can not update selected post!";
+                }
+            } catch (InValidDataException e) {
+                DialogProvider.createAndShowTerminalMessage("%s %s%s%n%n", "Wrong entered data format for", e.getMessage(), "!");
+            }
+        }
+        return "You Cancelled this operation!";
     }
 }

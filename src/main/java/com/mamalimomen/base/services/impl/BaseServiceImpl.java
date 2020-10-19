@@ -3,12 +3,11 @@ package com.mamalimomen.base.services.impl;
 import com.mamalimomen.base.domains.BaseEntity;
 import com.mamalimomen.base.repositories.BaseRepository;
 import com.mamalimomen.base.services.BaseService;
-import com.mamalimomen.base.dtos.BaseDTO;
 
 import java.util.List;
 import java.util.Optional;
 
-public abstract class BaseServiceImpl<PK extends Long, E extends BaseEntity, D extends BaseDTO, REP extends BaseRepository<PK, E, D>> implements BaseService<PK, E, D> {
+public abstract class BaseServiceImpl<PK extends Long, E extends BaseEntity, REP extends BaseRepository<PK, E>> implements BaseService<PK, E> {
     protected final REP repository;
 
     public BaseServiceImpl(REP repository) {
@@ -68,10 +67,5 @@ public abstract class BaseServiceImpl<PK extends Long, E extends BaseEntity, D e
     @Override
     public List<E> findAllByNamedQuery(String namedQuery, Class<E> c) {
         return repository.findAllByNamedQuery(namedQuery, c);
-    }
-
-    @Override
-    public <T> List<T> advancedSearch(D dto, Class<T> resultClass, Class<E> entityClass) {
-        return repository.advancedSearch(dto, resultClass, entityClass);
     }
 }

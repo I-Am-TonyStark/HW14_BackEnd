@@ -2,20 +2,25 @@ package com.mamalimomen.services;
 
 import com.mamalimomen.base.services.BaseService;
 import com.mamalimomen.domains.Account;
-import com.mamalimomen.dtos.AccountDTO;
-import com.mamalimomen.dtos.AccountSearchDTO;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface AccountService extends BaseService<Long, Account, AccountSearchDTO> {
-    boolean createNewAccount(AccountDTO dto);
+public interface AccountService extends BaseService<Long, Account> {
+    Optional<Account> createNewAccount();
 
-    Optional<AccountDTO> retrieveExistActiveAccount(AccountDTO dto);
+    Optional<Account> retrieveExistActiveAccount();
 
-    boolean updateExistActiveAccount(AccountDTO dto);
+    String updateExistActiveAccountPassword(Account account);
 
-    boolean deleteExistActiveAccount(AccountDTO dto);
+    String updateExistActiveAccountInformation(Account account);
 
-    List<AccountDTO> accountAdvancedSearch();
+    String addExistActiveAccountAPost(Account account);
+
+    String removeExistActiveAccountAPost(Account account);
+
+    String addExistActiveAccountAFollowing(Account followerAccount, Account followingAccount);
+
+    String removeExistActiveAccountAFollowing(Account followerAccount);
+
+    String deleteExistActiveAccount(Account account);
 }

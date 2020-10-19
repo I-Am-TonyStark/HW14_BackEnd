@@ -1,11 +1,15 @@
 package com.mamalimomen.domains;
 
 import com.mamalimomen.base.domains.BaseEntity;
+import org.hibernate.annotations.SelectBeforeUpdate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "tbl_account", catalog = "HW13_One", schema = "HW13_One")
+@SelectBeforeUpdate
+@Table(name = "tbl_account", catalog = "HW14_One", schema = "HW14_One")
 @NamedQueries({
         @NamedQuery(
                 name = "Account.findOneByUsername",
@@ -22,6 +26,17 @@ public final class Account extends BaseEntity implements Comparable<Account> {
     @Embedded
     private User user;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "fk_account", nullable = false)
+    private List<Post> posts = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "follower_following", joinColumns = {@JoinColumn(name = "follower_id")}, inverseJoinColumns = {@JoinColumn(name = "following_id")})
+    private List<Account> followings = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "followings", cascade = CascadeType.MERGE)
+    private List<Account> followers = new ArrayList<>();
+
     public User getUser() {
         return user;
     }
@@ -30,21 +45,50 @@ public final class Account extends BaseEntity implements Comparable<Account> {
         this.user = user;
     }
 
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public List<Account> getFollowings() {
+        return followings;
+    }
+
+    public void setFollowings(List<Account> followings) {
+        this.followings = followings;
+    }
+
+    public List<Account> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Account> followers) {
+        this.followers = followers;
+    }
+
+    public void addPost(Post post) {
+        this.getPosts().add(post);
+    }
+
+    public void addFollowing(Account following) {
+        this.getFollowings().add(following);
+    }
+
+    public void addFollower(Account follower) {
+        this.getFollowers().add(follower);
+        follower.getFollowings().add(this);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Followings: %d%tFollowers: %d%tPosts: %d%n%s%n", getFollowings().size(), getFollowers().size(), getPosts().size(), getUser());
+    }
+
     @Override
     public int compareTo(Account a) {
         return this.getId().compareTo(a.getId());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Account account = (Account) obj;
-        return this.hashCode() == account.hashCode();
-    }
-
-    @Override
-    public int hashCode() {
-        return this.getId().intValue();
     }
 }
