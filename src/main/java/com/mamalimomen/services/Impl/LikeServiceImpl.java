@@ -3,7 +3,6 @@ package com.mamalimomen.services.Impl;
 import com.mamalimomen.base.services.impl.BaseServiceImpl;
 import com.mamalimomen.domains.Account;
 import com.mamalimomen.domains.Like;
-import com.mamalimomen.domains.Post;
 import com.mamalimomen.repositories.LikeRepository;
 import com.mamalimomen.repositories.impl.LikeRepositoryImpl;
 import com.mamalimomen.services.LikeService;
@@ -18,11 +17,10 @@ public class LikeServiceImpl extends BaseServiceImpl<Long, Like, LikeRepository>
     }
 
     @Override
-    public Optional<Like> createNewLike(Account liker, Post liked) {
+    public Optional<Like> createNewLike(Account liker) {
         Like like = new Like();
 
         like.setLiker(liker);
-        liked.addLike(like);
 
         return Optional.of(like);
     }

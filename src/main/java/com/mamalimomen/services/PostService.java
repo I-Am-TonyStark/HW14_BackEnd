@@ -1,6 +1,7 @@
 package com.mamalimomen.services;
 
 import com.mamalimomen.base.services.BaseService;
+import com.mamalimomen.domains.Account;
 import com.mamalimomen.domains.Post;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public interface PostService extends BaseService<Long, Post> {
 
     String updateExistPost(Post post);
 
-    String addExistPostALike(Post post);
+    String addExistPostALike(Post liked, Account liker);
 
-    String addExistPostAComment(Post post);
+    String addExistPostAComment(Post commented, Account commenter);
 }

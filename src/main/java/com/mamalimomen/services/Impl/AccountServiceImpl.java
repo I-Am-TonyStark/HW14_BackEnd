@@ -223,6 +223,10 @@ public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountRe
     @Override
     public String removeExistActiveAccountAFollowing(Account followerAccount) {
         List<Account> followings = followerAccount.getFollowings();
+        if (followings.isEmpty()) {
+            return "You do not follow any Account yet!";
+        }
+
         while (true) {
             try {
                 for (int i = 1; i <= followings.size(); i++) {
@@ -230,12 +234,21 @@ public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountRe
                 }
                 DialogProvider.createAndShowTerminalMessage("%s", "Enter your choice (or other number for \"exit\"): ");
                 int choice = SingletonScanner.readInteger();
-                followings.remove(followings.get(choice - 1));
-                followerAccount.setFollowings(followings);
-                if (repository.updateOne(followerAccount)) {
-                    return "unFollow selected account and update your account successfully!";
+                Account chooseAccount = followings.get(choice - 1);
+
+                DialogProvider.createAndShowTerminalMessage("%s%n", chooseAccount);
+                DialogProvider.createAndShowTerminalMessage("%s", "Do you wanna unFollow it? (y/n)?");
+                String choose = SingletonScanner.readLine();
+                if (choose.equals("Y")) {
+                    followings.remove(chooseAccount);
+                    followerAccount.setFollowings(followings);
+                    if (repository.updateOne(followerAccount)) {
+                        return "unFollow selected account and update your account successfully!";
+                    } else {
+                        return "can not unFollow selected account or update your account!";
+                    }
                 } else {
-                    return "can not unFollow selected account or update your account!";
+                    break;
                 }
             } catch (InputMismatchException e) {
                 DialogProvider.createAndShowTerminalMessage("%s%n", "Wrong format, enter an integer number please!");

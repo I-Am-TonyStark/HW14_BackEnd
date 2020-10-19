@@ -5,7 +5,6 @@ import com.mamalimomen.base.controllers.utilities.SingletonScanner;
 import com.mamalimomen.base.services.impl.BaseServiceImpl;
 import com.mamalimomen.domains.Account;
 import com.mamalimomen.domains.Comment;
-import com.mamalimomen.domains.Post;
 import com.mamalimomen.repositories.CommentRepository;
 import com.mamalimomen.repositories.impl.CommentRepositoryImpl;
 import com.mamalimomen.services.CommentService;
@@ -20,23 +19,20 @@ public class CommentServiceImpl extends BaseServiceImpl<Long, Comment, CommentRe
     }
 
     @Override
-    public Optional<Comment> createNewComment(Account writer, Post commented) {
+    public Optional<Comment> createNewComment(Account writer) {
         Comment comment = new Comment();
-        while (true) {
-
-            DialogProvider.createAndShowTerminalMessage("%s", "Message: ");
-            String message = SingletonScanner.readParagraph();
-            if (message.equalsIgnoreCase("esc")) {
-                break;
-            }
-            comment.setMessage(message);
-
-            comment.setCreateDate(new Date(System.currentTimeMillis()));
-
-            comment.setWriter(writer);
-
-            return Optional.of(comment);
+        
+        DialogProvider.createAndShowTerminalMessage("%s", "Message: ");
+        String message = SingletonScanner.readParagraph();
+        if (message.equalsIgnoreCase("esc")) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        comment.setMessage(message);
+
+        comment.setCreateDate(new Date(System.currentTimeMillis()));
+
+        comment.setWriter(writer);
+
+        return Optional.of(comment);
     }
 }

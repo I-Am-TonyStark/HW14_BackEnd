@@ -1,44 +1,52 @@
 package com.mamalimomen.controllers.menus;
 
-import com.mamalimomen.dtos.AccountDTO;
+import com.mamalimomen.domains.Account;
 
-public class UserMenu<A extends AccountDTO> extends AbstractMenu<A> {
+public class UserMenu<A extends Account> extends AbstractMenu<A> {
     public UserMenu(A account) {
         super(account.getUser().getFullName() + "'s menu",
                 account,
                 "Change your password",
-                "Change your information",
-                "See your Posts",
+                "See|Change your information",
+                "See|Change|Delete your Posts",
                 "Insert new Post",
-                "See new Posts",
-                "See an Account",
+                "See|Like|Comment|Follow new Posts by Like count",
+                "See|Like|Comment new Posts by Following",
+                "Search|See|Follow an Account",
+                "unFollow an Account",
                 "Delete your Account"
         );
     }
 
     @Override
     public void routerMenu() {
-        while (getAccount() != null) {
+        while (!getAccount().getDeleted()) {
             switch (showMenu()) {
                 case 1:
                     Menus.changeYourPassword(getAccount());
                     break;
                 case 2:
-                    Menus.changeYourInformation(getAccount());
+                    Menus.seeChangeYourInformation(getAccount());
                     break;
                 case 3:
-                    Menus.seeYourPosts(getAccount());
+                    Menus.seeChangeDeleteYourPosts(getAccount());
                     break;
                 case 4:
                     Menus.insertNewPost(getAccount());
                     break;
                 case 5:
-                    Menus.seeNewPosts(getAccount());
+                    Menus.seeLikeCommentNewPostsByLikeCount(getAccount());
                     break;
                 case 6:
-                    Menus.seeAnAccount(getAccount());
+                    Menus.seeLikeCommentNewPostsByFollowing(getAccount());
                     break;
                 case 7:
+                    Menus.searchSeeFollowAnAccount(getAccount());
+                    break;
+                case 8:
+                    Menus.unFollowAnAccount(getAccount());
+                    break;
+                case 9:
                     Menus.deleteYourAccount(getAccount());
                     break;
                 default:

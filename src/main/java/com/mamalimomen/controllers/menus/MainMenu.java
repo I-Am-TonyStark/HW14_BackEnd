@@ -1,8 +1,8 @@
 package com.mamalimomen.controllers.menus;
 
-import com.mamalimomen.dtos.AccountDTO;
+import com.mamalimomen.domains.Account;
 
-public class MainMenu<A extends AccountDTO> extends AbstractMenu<A> {
+public class MainMenu<A extends Account> extends AbstractMenu<A> {
     public MainMenu() {
         super("main menu",
                 null,

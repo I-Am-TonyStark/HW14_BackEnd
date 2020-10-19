@@ -4,9 +4,16 @@ import com.mamalimomen.base.controllers.guis.DialogProvider;
 import com.mamalimomen.base.controllers.utilities.InValidDataException;
 import com.mamalimomen.base.controllers.utilities.SingletonScanner;
 import com.mamalimomen.base.services.impl.BaseServiceImpl;
+import com.mamalimomen.controllers.utilities.AppManager;
+import com.mamalimomen.controllers.utilities.Services;
+import com.mamalimomen.domains.Account;
+import com.mamalimomen.domains.Comment;
+import com.mamalimomen.domains.Like;
 import com.mamalimomen.domains.Post;
 import com.mamalimomen.repositories.PostRepository;
 import com.mamalimomen.repositories.impl.PostRepositoryImpl;
+import com.mamalimomen.services.CommentService;
+import com.mamalimomen.services.LikeService;
 import com.mamalimomen.services.PostService;
 
 import javax.persistence.EntityManager;
@@ -79,5 +86,31 @@ public class PostServiceImpl extends BaseServiceImpl<Long, Post, PostRepository>
             }
         }
         return "You Cancelled this operation!";
+    }
+
+    @Override
+    public String addExistPostALike(Post liked, Account liker) {
+        LikeService likeService = AppManager.getService(Services.LIKE_SERVICE);
+        Optional<Like> oLike = likeService.createNewLike(liker);
+        if (oLike.isPresent()) {
+            liked.addLike(oLike.get());
+            if (repository.updateOne(liked)) {
+                return "Like selected post successfully!";
+            }
+        }
+        return "can not Like selected post!";
+    }
+
+    @Override
+    public String addExistPostAComment(Post commented, Account commenter) {
+        CommentService commentService = AppManager.getService(Services.COMMENT_SERVICE);
+        Optional<Comment> oComment = commentService.createNewComment(commenter);
+        if (oComment.isPresent()) {
+            commented.addComment(oComment.get());
+            if (repository.updateOne(commented)) {
+                return "Comment selected post successfully!";
+            }
+        }
+        return "can not Comment selected post!";
     }
 }

@@ -3,13 +3,13 @@ package com.mamalimomen.controllers.menus;
 import com.mamalimomen.base.controllers.guis.DialogProvider;
 import com.mamalimomen.base.controllers.menus.Menu;
 import com.mamalimomen.base.controllers.utilities.SingletonScanner;
-import com.mamalimomen.dtos.AccountDTO;
+import com.mamalimomen.domains.Account;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 
-public abstract class AbstractMenu<A extends AccountDTO> implements Menu {
+public abstract class AbstractMenu<A extends Account> implements Menu {
     private final A account;
     private final String title;
     private final List<String> options;
