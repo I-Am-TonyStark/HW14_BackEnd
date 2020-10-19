@@ -6,7 +6,7 @@ public final class MainApp {
     private MainApp() {
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         AppManager.startApp();
         AppManager.endApp();
     }

@@ -2,24 +2,20 @@ package com.mamalimomen.domains;
 
 import com.mamalimomen.base.controllers.utilities.InValidDataException;
 import com.mamalimomen.base.domains.BaseEntity;
-import com.mamalimomen.dtos.AccountDTO;
-import com.mamalimomen.dtos.PostDTO;
+import org.hibernate.annotations.SelectBeforeUpdate;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "tbl_post", catalog = "HW13_One", schema = "HW13_One")
+@SelectBeforeUpdate
+@Table(name = "tbl_post", catalog = "HW14_One", schema = "HW14_One")
 @NamedQueries({
         @NamedQuery(
                 name = "Post.findAll",
-                query = "SELECT p FROM Post p"),
-        @NamedQuery(
-                name = "Post.findManyByAccountUsername",
-                query = "SELECT p FROM Post p JOIN p.account a WHERE a.user.username = ?1 ORDER BY p.insertDate ASC"),
-        @NamedQuery(
-                name = "Post.findFetchManyByAccountUsernameLike",
-                query = "SELECT p FROM Post p JOIN FETCH p.account a WHERE a.user.username like ?1")
+                query = "SELECT p FROM Post p WHERE p.deleted = TRUE ORDER BY COUNT(p.likes) ASC")
 })
 public class Post extends BaseEntity implements Comparable<Post> {
 
@@ -29,79 +25,87 @@ public class Post extends BaseEntity implements Comparable<Post> {
     @Column(name = "text", nullable = false, columnDefinition = "text")
     private String text;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "insert_date", updatable = false, nullable = false)
-    private Date insertDate;
+    @Column(name = "image_path")
+    private String imagePath;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "fk_account", nullable = false, updatable = false)
-    private Account account;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "create_date", updatable = false, nullable = false)
+    private Date createDate;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "fk_post", updatable = false, nullable = false)
+    private Set<Comment> comments;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "fk_post", updatable = false, nullable = false)
+    private Set<Like> likes;
 
     public String getText() {
         return text;
     }
 
-    public void setText(String text) {
+    public void setText(String text) throws InValidDataException {
+        if (text.length() < 20) {
+            throw new InValidDataException("Text");
+        }
         this.text = text;
     }
 
-    public Date getInsertDate() {
-        return insertDate;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setInsertDate(Date insertDate) {
-        this.insertDate = insertDate;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
-    public Account getAccount() {
-        return account;
+    public Date getCreateDate() {
+        return createDate;
     }
 
-    public void setAccount(Account account) {
-        this.account = account;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Set<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public Set<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<Like> likes) {
+        this.likes = likes;
+    }
+
+    public void addComment(Comment comment) {
+        this.getComments().add(comment);
+    }
+
+    public void addLike(Like like) {
+        this.getLikes().add(like);
+    }
+
+    public String printComments() {
+        return getComments().stream().map(Comment::toString).collect(Collectors.joining("\n"));
+    }
+
+    public String printLikes() {
+        return getLikes().stream().map(Like::toString).collect(Collectors.joining("\n"));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s%n%s%n%s%nLikes: %d%tComments: %d%n", getImagePath(), getText(), getCreateDate(), getLikes().size(), getComments().size());
     }
 
     @Override
     public int compareTo(Post p) {
-        return this.getInsertDate().compareTo(p.getInsertDate());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Post post = (Post) obj;
-        return this.hashCode() == post.hashCode();
-    }
-
-    @Override
-    public int hashCode() {
-        return this.getId().intValue();
-    }
-
-    public Post copyMeFrom(PostDTO postDTO) {
-        Account account = new Account();
-        account.setId(postDTO.getAccount().getId());
-
-        this.setText(postDTO.getText());
-        this.setInsertDate(postDTO.getInsertDate());
-        this.setAccount(account);
-        return this;
-    }
-
-    public PostDTO copyMeTo() {
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setId(this.getAccount().getId());
-
-        PostDTO dto = new PostDTO();
-        dto.setId(this.getId());
-        dto.setAccount(accountDTO);
-        dto.setInsertDate(this.getInsertDate());
-        try {
-            dto.setText(this.getText());
-        } catch (InValidDataException e) {
-            e.printStackTrace();
-        }
-        return dto;
+        return this.getCreateDate().compareTo(p.getCreateDate());
     }
 }
