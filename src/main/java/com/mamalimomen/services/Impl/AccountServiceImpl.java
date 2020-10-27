@@ -17,9 +17,7 @@ import com.mamalimomen.services.AccountService;
 import com.mamalimomen.services.PostService;
 
 import javax.persistence.EntityManager;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountRepository> implements AccountService {
     public AccountServiceImpl(EntityManager em) {
@@ -58,8 +56,9 @@ public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountRe
                 Account account = new Account();
                 account.setUser(user);
 
-                DialogProvider.createAndShowTerminalMessage("%s%n", repository.saveOne(account));
-                return Optional.of(account);
+                if (repository.saveOne(account)) {
+                    return Optional.of(account);
+                } else break;
             } catch (InValidDataException e) {
                 DialogProvider.createAndShowTerminalMessage("%s %s%s%n%n", "Wrong entered data format for", e.getMessage(), "!");
             }
@@ -146,11 +145,13 @@ public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountRe
                     if (newUsername.equalsIgnoreCase("esc")) {
                         break outer;
                     }
-                    copy.setUsername(newUsername);
+                    if (newUsername.equalsIgnoreCase("pass")) {
+                        break;
+                    }
                     if (repository.findOneAccountByUsername(newUsername).isPresent()) {
                         DialogProvider.createAndShowTerminalMessage("%s%n", "This Username has taken already!");
                     } else {
-                        break;
+                        copy.setUsername(newUsername);
                     }
                 }
 
@@ -213,9 +214,11 @@ public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountRe
     @Override
     public String addExistActiveAccountAFollowing(Account followerAccount, Account followingAccount) {
         followerAccount.addFollowing(followingAccount);
-        if (repository.updateOne(followingAccount)) {
+        if (repository.updateOne(followerAccount) && repository.updateOne(followingAccount)) {
             return "follow selected account and update your account successfully!";
         } else {
+            followerAccount.getFollowings().remove(followingAccount);
+            followingAccount.getFollowers().remove(followerAccount);
             return "can not follow selected account or update your account!";
         }
     }
@@ -237,9 +240,9 @@ public class AccountServiceImpl extends BaseServiceImpl<Long, Account, AccountRe
                 Account chooseAccount = followings.get(choice - 1);
 
                 DialogProvider.createAndShowTerminalMessage("%s%n", chooseAccount);
-                DialogProvider.createAndShowTerminalMessage("%s", "Do you wanna unFollow it? (y/n)?");
+                DialogProvider.createAndShowTerminalMessage("%s", "Do you wanna unFollow it? (y/n)? ");
                 String choose = SingletonScanner.readLine();
-                if (choose.equals("Y")) {
+                if (choose.equalsIgnoreCase("y")) {
                     followings.remove(chooseAccount);
                     followerAccount.setFollowings(followings);
                     if (repository.updateOne(followerAccount)) {

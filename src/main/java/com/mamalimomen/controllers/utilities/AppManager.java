@@ -10,6 +10,9 @@ import com.mamalimomen.services.Impl.LikeServiceImpl;
 import com.mamalimomen.services.Impl.PostServiceImpl;
 
 import javax.persistence.EntityManager;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 public final class AppManager {
@@ -20,6 +23,12 @@ public final class AppManager {
     }
 
     public synchronized static void startApp() {
+        try {
+            System.setErr(new PrintStream("D:\\عزم راسخ\\جاوا مکتب\\کلاس\\40\\HW14_BackEnd\\src\\main\\resources\\log.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
         EntityManager em = PersistenceUnitManager.getEntityManager(PersistenceUnits.UNIT_ONE);
 
         emList.add(em);

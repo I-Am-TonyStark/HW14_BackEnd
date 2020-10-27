@@ -7,6 +7,7 @@ import org.hibernate.annotations.SelectBeforeUpdate;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Entity
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 @NamedQueries({
         @NamedQuery(
                 name = "Post.findAll",
-                query = "SELECT p FROM Post p WHERE p.deleted = TRUE ORDER BY COUNT(p.likes) ASC")
+                query = "SELECT p FROM Post p LEFT JOIN p.likes l WHERE p.deleted = FALSE GROUP BY p.likes.size ORDER BY COUNT(p.likes.size) DESC")
 })
 public class Post extends BaseEntity implements Comparable<Post> {
 
@@ -26,19 +27,19 @@ public class Post extends BaseEntity implements Comparable<Post> {
     private String text;
 
     @Column(name = "image_path")
-    private String imagePath;
+    private String imagePath = "";
 
     @Temporal(TemporalType.DATE)
     @Column(name = "create_date", updatable = false, nullable = false)
     private Date createDate;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_post", updatable = false, nullable = false)
-    private Set<Comment> comments;
+    private Set<Comment> comments = new TreeSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_post", updatable = false, nullable = false)
-    private Set<Like> likes;
+    private Set<Like> likes = new TreeSet<>();
 
     public String getText() {
         return text;
@@ -101,7 +102,7 @@ public class Post extends BaseEntity implements Comparable<Post> {
 
     @Override
     public String toString() {
-        return String.format("%s%n%s%n%s%nLikes: %d%tComments: %d%n", getImagePath(), getText(), getCreateDate(), getLikes().size(), getComments().size());
+        return String.format("%s%n%s%n%s%nLikes: %d\tComments: %d%n", getImagePath(), getText(), getCreateDate(), getLikes().size(), getComments().size());
     }
 
     @Override

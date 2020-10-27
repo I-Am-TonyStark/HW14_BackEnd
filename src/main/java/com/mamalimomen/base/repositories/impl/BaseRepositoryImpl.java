@@ -162,4 +162,11 @@ public abstract class BaseRepositoryImpl<PK extends Long, E extends BaseEntity> 
         return em.createNamedQuery(namedQuery, c)
                 .getResultList();
     }
+
+
+    @Override
+    public List<E> findAllByNativeQuery(String nativeQuery, Class<E> c) {
+        return em.createNativeQuery(nativeQuery, c)
+                .getResultList();
+    }
 }

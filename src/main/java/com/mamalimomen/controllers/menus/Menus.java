@@ -20,9 +20,11 @@ public final class Menus {
     }
 
     static void login() {
+        AccountService accountService = AppManager.getService(Services.ACCOUNT_SERVICE);
+
         while (true) {
             DialogProvider.createAndShowTerminalMessage("%n====== %s ======%n", "LOGIN");
-            AccountService accountService = AppManager.getService(Services.ACCOUNT_SERVICE);
+
             Optional<Account> oAccount = accountService.retrieveExistActiveAccount();
 
             if (oAccount.isEmpty()) {
@@ -47,9 +49,10 @@ public final class Menus {
     }
 
     static void signUp() {
+        AccountService accountService = AppManager.getService(Services.ACCOUNT_SERVICE);
+
         while (true) {
             DialogProvider.createAndShowTerminalMessage("%n====== %s ======%n", "SIGN UP");
-            AccountService accountService = AppManager.getService(Services.ACCOUNT_SERVICE);
 
             Optional<Account> oAccount = accountService.createNewAccount();
             if (oAccount.isPresent()) {
@@ -80,14 +83,15 @@ public final class Menus {
     static <A extends Account> void seeChangeDeleteYourPosts(A account) {
         PostService postService = AppManager.getService(Services.POST_SERVICE);
         AccountService accountService = AppManager.getService(Services.ACCOUNT_SERVICE);
-        List<Post> posts = account.getPosts();
-
-        if (posts.isEmpty()) {
-            DialogProvider.createAndShowTerminalMessage("%s%n", "You have no post yet!");
-            return;
-        }
 
         while (true) {
+            List<Post> posts = account.getPosts();
+
+            if (posts.isEmpty()) {
+                DialogProvider.createAndShowTerminalMessage("%s%n", "You have no post yet!");
+                return;
+            }
+
             DialogProvider.createAndShowTerminalMessage("%n====== %s ======%n", "SEE|CHANGE|DELETE YOUR POSTS");
             DialogProvider.createAndShowTerminalMessage("%s", "Which action (D or C)? ");
             String choose = SingletonScanner.readLine();
@@ -120,14 +124,15 @@ public final class Menus {
 
     static <A extends Account> void seeLikeCommentNewPostsByLikeCount(A account) {
         PostService postService = AppManager.getService(Services.POST_SERVICE);
-        List<Post> posts = postService.retrieveAllExistPostsOrderByLike();
-
-        if (posts.isEmpty()) {
-            DialogProvider.createAndShowTerminalMessage("%s%n", "There is not any post yet!");
-            return;
-        }
 
         while (true) {
+            List<Post> posts = postService.retrieveAllExistPostsOrderByLike();
+
+            if (posts.isEmpty()) {
+                DialogProvider.createAndShowTerminalMessage("%s%n", "There is not any post yet!");
+                return;
+            }
+
             DialogProvider.createAndShowTerminalMessage("%n====== %s ======%n", "SEE|LIKE|COMMENT NEW POSTS BY LIKE COUNT");
             try {
                 for (int i = 1; i <= posts.size(); i++) {
@@ -138,6 +143,8 @@ public final class Menus {
                 Post post = posts.get(choice - 1);
 
                 DialogProvider.createAndShowTerminalMessage("%s%n", post);
+                DialogProvider.createAndShowInformationDialog(post.printLikes(), "Likes");
+                DialogProvider.createAndShowInformationDialog(post.printComments(), "Comments");
 
                 DialogProvider.createAndShowTerminalMessage("%s", "Which action (C or L)? ");
                 String choose = SingletonScanner.readLine();
@@ -190,6 +197,8 @@ public final class Menus {
                         Post post = posts.get(choice - 1);
 
                         DialogProvider.createAndShowTerminalMessage("%s%n", post);
+                        DialogProvider.createAndShowInformationDialog(post.printLikes(), "Likes");
+                        DialogProvider.createAndShowInformationDialog(post.printComments(), "Comments");
 
                         DialogProvider.createAndShowTerminalMessage("%s", "Which action (C or L)? ");
                         String choose = SingletonScanner.readLine();
@@ -216,6 +225,7 @@ public final class Menus {
 
     static <A extends Account> void searchSeeFollowAnAccount(A account) {
         AccountService accountService = AppManager.getService(Services.ACCOUNT_SERVICE);
+
         while (true) {
             DialogProvider.createAndShowTerminalMessage("%n====== %s ======%n", "SEARCH|SEE|FOLLOW AN ACCOUNT");
             Optional<Account> oAccount = accountService.retrieveExistActiveAccount();
@@ -232,11 +242,15 @@ public final class Menus {
 
             DialogProvider.createAndShowTerminalMessage("%s%n", searchedAccount);
 
-            DialogProvider.createAndShowTerminalMessage("%s", "Do you want follow it? (y/n)?");
+            DialogProvider.createAndShowTerminalMessage("%s", "Do you want follow it? (y/n)? ");
             String choose = SingletonScanner.readLine();
-            if (choose.equals("Y")) {
-                DialogProvider.createAndShowTerminalMessage("%s%n", accountService.addExistActiveAccountAFollowing(account, searchedAccount));
-                break;
+            if (choose.equalsIgnoreCase("y")) {
+                if (searchedAccount.equals(account)) {
+                    DialogProvider.createAndShowTerminalMessage("%s%n", "You can not follow yourself!");
+                } else {
+                    DialogProvider.createAndShowTerminalMessage("%s%n", accountService.addExistActiveAccountAFollowing(account, searchedAccount));
+                    break;
+                }
             }
 
             DialogProvider.createAndShowTerminalMessage("%s", "Try for another Account (y/n)? ");

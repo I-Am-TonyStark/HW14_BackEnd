@@ -27,4 +27,6 @@ public interface BaseRepository<PK extends Long, E extends BaseEntity> {
     List<E> findManyByNamedQuery(String namedQuery, Class<E> c, Object... parameters);
 
     List<E> findAllByNamedQuery(String namedQuery, Class<E> c);
+
+    List<E> findAllByNativeQuery(String nativeQuery, Class<E> c);
 }

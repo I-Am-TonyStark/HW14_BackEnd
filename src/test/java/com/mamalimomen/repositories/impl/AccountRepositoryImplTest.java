@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import static junit.framework.TestCase.*;
 
 @Tag("repository")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AccountRepositoryImplTest {
     static EntityManagerFactory emf;
     AccountRepository ar;
@@ -45,9 +46,9 @@ class AccountRepositoryImplTest {
 
 
     @Test
-    @Order(1)
+    @Order(2)
     @DisplayName("Find one active Account by username")
-    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
+    @Timeout(value = 10000, unit = TimeUnit.MILLISECONDS)
     void findOneActiveAccountByUsernameTest() {
         Optional<Account> oAccount1 = ar.findOneActiveAccountByUsername("test");
         assertFalse(oAccount1.isPresent());
@@ -58,7 +59,7 @@ class AccountRepositoryImplTest {
             user.setFirstName("test");
             user.setLastName("test");
             user.setUsername("test");
-            user.setPassword("test");
+            user.setPassword("Test2120");
 
             Account account1 = new Account();
             account1.setUser(user);
@@ -82,9 +83,9 @@ class AccountRepositoryImplTest {
     }
 
     @Test
-    @Order(2)
+    @Order(1)
     @DisplayName("Find one Account by username")
-    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
+    @Timeout(value = 10000, unit = TimeUnit.MILLISECONDS)
     void findOneAccountByUsernameTest() {
         Optional<Account> oAccount1 = ar.findOneAccountByUsername("test");
         assertFalse(oAccount1.isPresent());
@@ -95,7 +96,7 @@ class AccountRepositoryImplTest {
             user.setFirstName("test");
             user.setLastName("test");
             user.setUsername("test");
-            user.setPassword("test");
+            user.setPassword("Test2120");
 
             Account account1 = new Account();
             account1.setUser(user);

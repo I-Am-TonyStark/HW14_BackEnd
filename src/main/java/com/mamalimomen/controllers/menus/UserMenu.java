@@ -10,7 +10,7 @@ public class UserMenu<A extends Account> extends AbstractMenu<A> {
                 "See|Change your information",
                 "See|Change|Delete your Posts",
                 "Insert new Post",
-                "See|Like|Comment|Follow new Posts by Like count",
+                "See|Like|Comment new Posts by Like count",
                 "See|Like|Comment new Posts by Following",
                 "Search|See|Follow an Account",
                 "unFollow an Account",

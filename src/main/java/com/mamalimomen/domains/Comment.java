@@ -21,8 +21,8 @@ public final class Comment extends BaseEntity implements Comparable<Comment> {
     @Column(name = "create_date", updatable = false, nullable = false)
     private Date createDate;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "writer_account_id", updatable = false, nullable = false)
+    @OneToOne
+    @JoinColumn(name = "fk_writer_account", updatable = false, nullable = false)
     private Account writer;
 
     public String getMessage() {

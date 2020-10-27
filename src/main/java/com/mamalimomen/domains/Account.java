@@ -27,14 +27,15 @@ public final class Account extends BaseEntity implements Comparable<Account> {
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "fk_account", nullable = false)
+    @JoinColumn(name = "fk_account")
     private List<Post> posts = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinTable(name = "follower_following", joinColumns = {@JoinColumn(name = "follower_id")}, inverseJoinColumns = {@JoinColumn(name = "following_id")})
+    @JoinTable(name = "follower_following", joinColumns = {@JoinColumn(name = "follower_id")}, inverseJoinColumns = {@JoinColumn(name = "following_id")},
+            uniqueConstraints = {@UniqueConstraint(name = "unique_follower_following",columnNames = {"follower_id","following_id"})})
     private List<Account> followings = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "followings", cascade = CascadeType.MERGE)
+    @ManyToMany(mappedBy = "followings")
     private List<Account> followers = new ArrayList<>();
 
     public User getUser() {
@@ -75,6 +76,7 @@ public final class Account extends BaseEntity implements Comparable<Account> {
 
     public void addFollowing(Account following) {
         this.getFollowings().add(following);
+        following.getFollowers().add(this);
     }
 
     public void addFollower(Account follower) {
@@ -84,7 +86,7 @@ public final class Account extends BaseEntity implements Comparable<Account> {
 
     @Override
     public String toString() {
-        return String.format("Followings: %d%tFollowers: %d%tPosts: %d%n%s%n", getFollowings().size(), getFollowers().size(), getPosts().size(), getUser());
+        return String.format("Followings: %d\tFollowers: %d\tPosts: %d%n%s", getFollowings().size(), getFollowers().size(), getPosts().size(), getUser());
     }
 
     @Override

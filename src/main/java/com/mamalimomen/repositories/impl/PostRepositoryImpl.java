@@ -15,6 +15,11 @@ public class PostRepositoryImpl extends BaseRepositoryImpl<Long, Post> implement
 
     @Override
     public List<Post> findAllPosts() {
-        return findAllByNamedQuery("Post.findAll", Post.class);
+        return findAllByNativeQuery("select p.* " +
+                "from hw14_one.tbl_post p " +
+                "left join hw14_one.tbl_like l on p.id = l.fk_post " +
+                "where p.is_deleted = false " +
+                "group by l.fk_post " +
+                "order by count(l.fk_post) desc", Post.class);
     }
 }

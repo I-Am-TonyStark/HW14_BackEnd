@@ -68,7 +68,9 @@ public class PostServiceImpl extends BaseServiceImpl<Long, Post, PostRepository>
                 if (newText.equalsIgnoreCase("esc")) {
                     break;
                 }
-                post.setText(newText);
+                if (!newText.equalsIgnoreCase("pass")) {
+                    post.setText(newText);
+                }
 
                 DialogProvider.createAndShowTerminalMessage("%s (old = %s): ", "New Image path", post.getImagePath());
                 String newImagePath = SingletonScanner.readLine();
